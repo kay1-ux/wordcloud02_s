@@ -1,0 +1,105 @@
+<html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.js" integrity="sha512-UWEnsxiF3PBLuxBEFjpFEHQGZNLwWFqztm66Wok/kXsGSrcOS76CP3ovpEQmwlOmR2Co4iV5FmXrdb7YzP37SA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    </head>
+    <body>
+        <div class="my-wordcloud"></div>
+        <style>
+            .wordcloud-container {
+                position: relative;
+                width: 100%;
+            }
+            .wordcloud-container svg {
+                z-index: 0;
+                width: 100%;
+            }
+            .tool-tip {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                opacity: 0;
+                max-width: 50%;
+                padding: 1rem 1.5rem;
+                background-color: #bbb;
+                -webkit-transition: all 0.5s 0s ease;
+                -moz-transition: all 0.5s 0s ease;
+                -o-transition: all 0.5s 0s ease;
+                transition: all 0.5s 0s ease;
+            }
+            .tool-tip.active { 
+                opacity: 1;
+            }
+        </style>
+        <script>
+        
+            const wordCloud = [
+                {text:"textiles", size: 130, body: "With digital designing and making it is easier to try out different and new ideas. With traditional methods it is too time, material and labour intensive to try everything out. [Textiles, Year 2]"},
+                {text:"jewellery", size: 90, body: "I do not prefer to use digital equipment and digital design to solely be my influence. I prefer to render and create with my hands, although I found it very influential in ways of how I would implement mass production of jewellery deign. [Jewellery, Year 4]"},
+                {text:"ceramics", size: 65, body: "With learning craft skills online, the sense of touch is gone, because you can’t feel the samples you are trying to make. [Ceramics, Year 4]"},
+                {text:"glass", size: 55, body: "I’m a very visual and tactile learner, and I struggle to fully understand concepts/techniques if I’m not there in person to watch and try myself. [Glass, Year 3]"},
+                {text:"print", size: 50, body: ""},
+                {text:"sculpture", size: 50, body: ""},
+                {text:"undisclosed", size: 50, body: ""},
+                {text:"photography", size: 15, body: ""},
+                {text:"still exploring", size: 15, body: "To be honest, I don't think I have learned many useful craft skills or techniques through remote teaching. The studio projects tend to focus more on some deeper meaning rather than technical skills. [Year 2]"},
+                {text:"painting", size: 15, body: ""},  
+            ]
+
+            var fill = d3.scale.category20();
+            var layout = d3.layout.cloud()
+                .size([600, 450])
+                .words(wordCloud)
+                .padding(4)
+                .rotate(function() { return 0; })
+                .font("Open Sans")
+                .fontSize(function(d) { return d.size })
+                .on("end", draw);
+
+            container = d3.select("div.my-wordcloud").append("div")
+                .attr("class", "wordcloud-container")
+            
+            function draw(words) {
+                
+                svg = container.append("svg")
+                .attr("viewBox", "0 0 600 450")
+                .attr("preserveAspectRatio", "xMidYMid meet")
+                .classed("svg-content", true)
+                .selectAll("text")
+                .data(words)
+                .enter()
+                .append("g")
+                .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+                .append("text")
+                .style("font-size", function(d) { return d.size; })
+                .style("font-family", "Open Sans")
+                .style("fill", "#BB4F0D")
+                .attr("text-anchor", "middle")
+                .attr("transform", function(d) {
+                    return "translate(" + [d.x, d.y] + ")";
+                })
+                .text(function(d) { return d.text; })
+                .attr('pointer-events', 'boundingBox')
+                .on("mouseenter", function (d) {
+                    const el = document.getElementsByClassName("tool-tip " + d.text);
+                    el[0].classList.add("active");
+                })
+                .on("mouseleave", function (d) { 
+                    const el = document.getElementsByClassName("tool-tip " + d.text);
+                    el[0].classList.remove("active");
+                })
+
+                container.selectAll("div.wordcloud-container")
+                .data(words)
+                .enter()
+                .append("div")
+                .attr("class", function (d) { return "tool-tip " + d.text; })
+                .append("div")
+                .text(function(d) { return d.body; })
+
+            }
+
+            layout.start();
+        </script>
+    </body>
+</html>
